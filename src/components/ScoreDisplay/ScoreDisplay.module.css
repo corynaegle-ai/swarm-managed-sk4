@@ -103,7 +103,7 @@
   font-weight: 500;
   position: sticky;
   left: 0;
-  background-color: inherit;
+  background-color: white;
   border-right: 2px solid #ddd;
   z-index: 10;
 }

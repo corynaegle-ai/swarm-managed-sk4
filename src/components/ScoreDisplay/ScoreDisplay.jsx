@@ -13,11 +13,18 @@ const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
 
   // Calculate total scores and sort players by total score descending
   const playersWithTotals = gameData.players
-    .map(player => ({
+    .map((player, index) => ({
       ...player,
-      totalScore: player.rounds ? player.rounds.reduce((sum, score) => sum + (score || 0), 0) : 0
+      totalScore: player.rounds ? player.rounds.reduce((sum, score) => sum + (score || 0), 0) : 0,
+      originalIndex: index
     }))
-    .sort((a, b) => b.totalScore - a.totalScore);
+    .sort((a, b) => {
+      // Sort by total score descending, then by original index for stable sort
+      if (b.totalScore !== a.totalScore) {
+        return b.totalScore - a.totalScore;
+      }
+      return a.originalIndex - b.originalIndex;
+    });
 
   // Get maximum number of rounds to determine columns
   const maxRounds = Math.max(
