@@ -1,0 +1,70 @@
+.bid-collection {
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.bid-collection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.bid-input-group {
+  margin-bottom: 20px;
+}
+
+.bid-input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.bid-input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.bid-input-group input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.bid-input-group input.error {
+  border-color: #f44336;
+  color: #f44336;
+}
+
+.error-message {
+  margin-top: 5px;
+  color: #f44336;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.submit-bids {
+  width: 100%;
+  padding: 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-bids:hover {
+  background-color: #45a049;
+}
+
+.submit-bids:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
