@@ -1,0 +1,155 @@
+.score-entry {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.score-entry h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 1.4rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+.score-entry-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.player-score-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #007bff;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.player-name {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.player-bid {
+  color: #666;
+  font-size: 0.9rem;
+  background: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.score-inputs {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.tricks-input,
+.bonus-input {
+  width: 80px;
+  padding: 8px 10px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  text-align: center;
+  transition: border-color 0.2s ease;
+}
+
+.tricks-input:focus,
+.bonus-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.tricks-input:invalid {
+  border-color: #dc3545;
+}
+
+.input-range {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+}
+
+.score-display {
+  text-align: center;
+}
+
+.round-score {
+  font-weight: bold;
+  color: #007bff;
+  font-size: 1.1rem;
+  background: #e7f3ff;
+  padding: 8px 15px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .player-score-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .score-inputs {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .tricks-input,
+  .bonus-input {
+    width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .score-entry {
+    padding: 15px;
+    margin: 10px 0;
+  }
+  
+  .score-inputs {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .input-group {
+    align-items: center;
+  }
+  
+  .tricks-input,
+  .bonus-input {
+    width: 120px;
+  }
+}
