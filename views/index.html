@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - My Application{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/css/home.css">
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to My Application</h1>
+            <p class="hero-subtitle">A modern, responsive web application built with best practices</p>
+            <img src="/images/hero-image.jpg" alt="Hero Image" class="img-responsive hero-image">
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Features</h2>
+        <div class="features-grid responsive-grid">
+            <div class="feature-card">
+                <img src="/images/feature1.jpg" alt="Feature 1" class="img-responsive feature-image">
+                <h3>Responsive Design</h3>
+                <p>Optimized for all devices and screen sizes</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/feature2.jpg" alt="Feature 2" class="img-responsive feature-image">
+                <h3>Modern UI</h3>
+                <p>Clean and intuitive user interface</p>
+            </div>
+            <div class="feature-card">
+                <img src="/images/feature3.jpg" alt="Feature 3" class="img-responsive feature-image">
+                <h3>Performance</h3>
+                <p>Fast loading and optimized performance</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Get Started Today</h2>
+            <p>Join thousands of users who trust our platform</p>
+            <button class="btn btn-primary btn-responsive">Get Started</button>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/js/responsive.js"></script>
+{% endblock %}
