@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BiddingPhase from '../components/BiddingPhase';
 import TrickPhase from '../components/TrickPhase';
@@ -11,19 +11,19 @@ const GamePage = () => {
   const { currentPhase, round, isPhaseComplete } = gameState;
 
   // Handle phase completion and automatic progression
-  const handlePhaseComplete = () => {
+  const handlePhaseComplete = useCallback(() => {
     dispatch({ type: 'NEXT_PHASE' });
-  };
+  }, [dispatch]);
 
   // Handle game completion logic
-  const handleGameComplete = () => {
+  const handleGameComplete = useCallback(() => {
     if (round >= 10) {
       dispatch({ type: 'SET_PHASE', payload: 'gameOver' });
     } else {
       dispatch({ type: 'INCREMENT_ROUND' });
       dispatch({ type: 'SET_PHASE', payload: 'bidding' });
     }
-  };
+  }, [round, dispatch]);
 
   // Auto-advance from scoring phase after 2 seconds
   useEffect(() => {
@@ -38,7 +38,18 @@ const GamePage = () => {
         clearTimeout(timer);
       }
     };
-  }, [currentPhase, isPhaseComplete]);
+  }, [currentPhase, isPhaseComplete, handlePhaseComplete]);
+
+  // Check for game completion after scoring phase completes
+  useEffect(() => {
+    // When transitioning from scoring phase, check if game should end
+    if (currentPhase === 'bidding' && round > 1) {
+      // We just transitioned to a new round, check if we should have ended
+      if (round > 10) {
+        dispatch({ type: 'SET_PHASE', payload: 'gameOver' });
+      }
+    }
+  }, [currentPhase, round, dispatch]);
 
   // Progress indicator component
   const ProgressIndicator = () => (
