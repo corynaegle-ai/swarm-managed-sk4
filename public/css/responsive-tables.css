@@ -1,0 +1,152 @@
+/* Responsive Tables CSS */
+
+/* Base responsive table wrapper */
+.responsive-table-wrapper {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+/* Table styling */
+.responsive-table {
+  width: 100%;
+  min-width: 600px; /* Minimum width to prevent cramping */
+  margin-bottom: 0;
+  border-collapse: collapse;
+}
+
+.responsive-table th,
+.responsive-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.responsive-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Sticky first column for important data */
+.responsive-table.sticky-first-col th:first-child,
+.responsive-table.sticky-first-col td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: inherit;
+  z-index: 1;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.responsive-table.sticky-first-col th:first-child {
+  z-index: 3;
+  background-color: #f8f9fa;
+}
+
+/* Scroll indicators */
+.responsive-table-wrapper::before,
+.responsive-table-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  z-index: 10;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.responsive-table-wrapper::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+  opacity: 0;
+}
+
+.responsive-table-wrapper::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+  opacity: 0;
+}
+
+.responsive-table-wrapper.has-scroll-left::before {
+  opacity: 1;
+}
+
+.responsive-table-wrapper.has-scroll-right::after {
+  opacity: 1;
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 768px) {
+  .responsive-table th,
+  .responsive-table td {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .responsive-table {
+    min-width: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-table {
+    min-width: 400px;
+  }
+  
+  .responsive-table th,
+  .responsive-table td {
+    padding: 0.375rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Scrollbar styling for webkit browsers */
+.responsive-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.responsive-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.responsive-table-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.responsive-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Focus and accessibility */
+.responsive-table-wrapper:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .responsive-table-wrapper {
+    overflow: visible;
+    border: none;
+  }
+  
+  .responsive-table {
+    min-width: auto;
+  }
+  
+  .responsive-table-wrapper::before,
+  .responsive-table-wrapper::after {
+    display: none;
+  }
+}
