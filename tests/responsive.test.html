@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive CSS Test</title>
+    <link rel="stylesheet" href="../public/css/responsive.css">
+    <style>
+        .test-box {
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Responsive CSS Test</h1>
+        <p>Base font size should be 16px minimum. Resize window to test breakpoints.</p>
+        
+        <h2>Grid System Test</h2>
+        <div class="grid">
+            <div class="col-12 tablet:col-6 desktop:col-4">
+                <div class="test-box">Column 1</div>
+            </div>
+            <div class="col-12 tablet:col-6 desktop:col-4">
+                <div class="test-box">Column 2</div>
+            </div>
+            <div class="col-12 tablet:col-2 desktop:col-4">
+                <div class="test-box">Column 3</div>
+            </div>
+        </div>
+        
+        <h2>Breakpoint Indicators</h2>
+        <div class="test-box">
+            <p class="desktop:hidden">Mobile/Tablet View (< 1024px)</p>
+            <p class="hidden desktop:block">Desktop View (≥ 1024px)</p>
+        </div>
+        
+        <h2>Typography Test</h2>
+        <h1>H1 Heading</h1>
+        <h2>H2 Heading</h2>
+        <h3>H3 Heading</h3>
+        <p>This paragraph should be at least 16px and readable without zooming.</p>
+    </div>
+</body>
+</html>
