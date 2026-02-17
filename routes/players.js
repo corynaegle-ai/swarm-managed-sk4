@@ -1,56 +1,12 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
-const path = require('path');
-
 const router = express.Router();
 
-// In-memory storage for MVP (can be replaced with database later)
-let games = {};
+// In-memory storage for games and players
+const games = new Map();
 
-// Simple file-based persistence for MVP
-const dataFile = path.join(__dirname, '..', 'data', 'games.json');
-
-// Load existing data on startup
-function loadGames() {
-  try {
-    if (fs.existsSync(dataFile)) {
-      const data = fs.readFileSync(dataFile, 'utf8');
-      games = JSON.parse(data);
-    }
-  } catch (error) {
-    console.error('Error loading games data:', error);
-    games = {};
-  }
-}
-
-// Save games data to file
-function saveGames() {
-  try {
-    const dir = path.dirname(dataFile);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(dataFile, JSON.stringify(games, null, 2));
-  } catch (error) {
-    console.error('Error saving games data:', error);
-  }
-}
-
-// Load games on module initialization
-loadGames();
-
-// Validation middleware
-function validateGameExists(req, res, next) {
-  const { gameId } = req.params;
-  if (!games[gameId]) {
-    games[gameId] = { players: [], started: false };
-    saveGames();
-  }
-  next();
-}
-
-function validatePlayerName(req, res, next) {
+// Middleware for input validation
+const validatePlayerName = (req, res, next) => {
   const { name } = req.body;
   if (!name || typeof name !== 'string' || name.trim().length === 0) {
     return res.status(400).json({ error: 'Player name is required and must be a non-empty string' });
@@ -60,162 +16,179 @@ function validatePlayerName(req, res, next) {
   }
   req.body.name = name.trim();
   next();
-}
+};
 
-function validatePlayerExists(req, res, next) {
-  const { gameId, playerId } = req.params;
-  const game = games[gameId];
-  const player = game.players.find(p => p.id === playerId);
+const validateGameExists = (req, res, next) => {
+  const { gameId } = req.params;
+  if (!games.has(gameId)) {
+    games.set(gameId, { players: [], gameStarted: false });
+  }
+  req.game = games.get(gameId);
+  next();
+};
+
+const validatePlayerExists = (req, res, next) => {
+  const { playerId } = req.params;
+  const player = req.game.players.find(p => p.id === playerId);
   if (!player) {
     return res.status(404).json({ error: 'Player not found' });
   }
   req.player = player;
   next();
-}
+};
 
-// GET /api/games/:gameId/players - List all players in a game
-router.get('/:gameId/players', validateGameExists, (req, res) => {
-  const { gameId } = req.params;
-  const game = games[gameId];
-  
-  res.json({
-    players: game.players,
-    count: game.players.length,
-    gameStarted: game.started
-  });
-});
-
-// POST /api/games/:gameId/players - Add a player to a game
+// POST /api/games/:gameId/players - Add player to game
 router.post('/:gameId/players', validateGameExists, validatePlayerName, (req, res) => {
-  const { gameId } = req.params;
-  const { name } = req.body;
-  const game = games[gameId];
-  
-  // Check if game has already started
-  if (game.started) {
-    return res.status(400).json({ error: 'Cannot add players to a game that has already started' });
+  try {
+    const { name } = req.body;
+    const game = req.game;
+    
+    // Check if game has started
+    if (game.gameStarted) {
+      return res.status(400).json({ error: 'Cannot add players to a game that has already started' });
+    }
+    
+    // Check player limit (max 8 players)
+    if (game.players.length >= 8) {
+      return res.status(400).json({ error: 'Maximum of 8 players allowed per game' });
+    }
+    
+    // Check for unique name
+    const nameExists = game.players.some(player => 
+      player.name.toLowerCase() === name.toLowerCase()
+    );
+    if (nameExists) {
+      return res.status(400).json({ error: 'Player name must be unique within the game' });
+    }
+    
+    // Create new player
+    const newPlayer = {
+      id: uuidv4(),
+      name: name,
+      createdAt: new Date().toISOString()
+    };
+    
+    game.players.push(newPlayer);
+    
+    res.status(201).json({
+      message: 'Player added successfully',
+      player: newPlayer,
+      totalPlayers: game.players.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-  
-  // Check player limit (max 8 players)
-  if (game.players.length >= 8) {
-    return res.status(400).json({ error: 'Maximum of 8 players allowed per game' });
-  }
-  
-  // Check for unique name
-  const existingPlayer = game.players.find(p => p.name.toLowerCase() === name.toLowerCase());
-  if (existingPlayer) {
-    return res.status(400).json({ error: 'Player name must be unique within the game' });
-  }
-  
-  // Create new player
-  const newPlayer = {
-    id: uuidv4(),
-    name: name,
-    joinedAt: new Date().toISOString()
-  };
-  
-  game.players.push(newPlayer);
-  saveGames();
-  
-  res.status(201).json({
-    player: newPlayer,
-    message: 'Player added successfully'
-  });
 });
 
-// PUT /api/games/:gameId/players/:playerId - Update player name
+// PUT /api/games/:gameId/players/:playerId - Edit player name
 router.put('/:gameId/players/:playerId', validateGameExists, validatePlayerExists, validatePlayerName, (req, res) => {
-  const { gameId } = req.params;
-  const { name } = req.body;
-  const game = games[gameId];
-  const player = req.player;
-  
-  // Check if game has already started
-  if (game.started) {
-    return res.status(400).json({ error: 'Cannot modify players in a game that has already started' });
+  try {
+    const { name } = req.body;
+    const game = req.game;
+    const player = req.player;
+    
+    // Check if game has started
+    if (game.gameStarted) {
+      return res.status(400).json({ error: 'Cannot edit players in a game that has already started' });
+    }
+    
+    // Check for unique name (excluding current player)
+    const nameExists = game.players.some(p => 
+      p.id !== player.id && p.name.toLowerCase() === name.toLowerCase()
+    );
+    if (nameExists) {
+      return res.status(400).json({ error: 'Player name must be unique within the game' });
+    }
+    
+    // Update player name
+    player.name = name;
+    player.updatedAt = new Date().toISOString();
+    
+    res.json({
+      message: 'Player name updated successfully',
+      player: player
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-  
-  // Check for unique name (excluding current player)
-  const existingPlayer = game.players.find(p => p.id !== player.id && p.name.toLowerCase() === name.toLowerCase());
-  if (existingPlayer) {
-    return res.status(400).json({ error: 'Player name must be unique within the game' });
-  }
-  
-  // Update player name
-  player.name = name;
-  player.updatedAt = new Date().toISOString();
-  saveGames();
-  
-  res.json({
-    player: player,
-    message: 'Player name updated successfully'
-  });
 });
 
-// DELETE /api/games/:gameId/players/:playerId - Remove a player from a game
+// DELETE /api/games/:gameId/players/:playerId - Remove player
 router.delete('/:gameId/players/:playerId', validateGameExists, validatePlayerExists, (req, res) => {
-  const { gameId, playerId } = req.params;
-  const game = games[gameId];
-  
-  // Check if game has already started
-  if (game.started) {
-    return res.status(400).json({ error: 'Cannot remove players from a game that has already started' });
-  }
-  
-  // Check minimum player count (must have at least 2 players to start a game)
-  // Only enforce this if there are currently 2 or fewer players
-  if (game.players.length <= 2 && game.players.length > 1) {
-    return res.status(400).json({ 
-      error: 'Cannot remove player - minimum of 2 players required for game',
-      currentCount: game.players.length
+  try {
+    const game = req.game;
+    const { playerId } = req.params;
+    
+    // Check if game has started
+    if (game.gameStarted) {
+      return res.status(400).json({ error: 'Cannot remove players from a game that has already started' });
+    }
+    
+    // Check minimum player count (need at least 1 to remove, leaving minimum 0 for pre-game)
+    // Note: The actual minimum of 2 players is enforced when starting the game
+    game.players = game.players.filter(player => player.id !== playerId);
+    
+    res.json({
+      message: 'Player removed successfully',
+      totalPlayers: game.players.length
     });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-  
-  // Remove player
-  const playerIndex = game.players.findIndex(p => p.id === playerId);
-  const removedPlayer = game.players.splice(playerIndex, 1)[0];
-  saveGames();
-  
-  res.json({
-    removedPlayer: removedPlayer,
-    remainingCount: game.players.length,
-    message: 'Player removed successfully'
-  });
 });
 
-// Helper endpoint to start a game (validates 2-8 player requirement)
+// GET /api/games/:gameId/players - List all players in game
+router.get('/:gameId/players', validateGameExists, (req, res) => {
+  try {
+    const game = req.game;
+    
+    res.json({
+      gameId: req.params.gameId,
+      players: game.players,
+      totalPlayers: game.players.length,
+      gameStarted: game.gameStarted,
+      canStart: game.players.length >= 2 && game.players.length <= 8
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Additional helper endpoint to start a game (validates 2-8 player requirement)
 router.post('/:gameId/start', validateGameExists, (req, res) => {
-  const { gameId } = req.params;
-  const game = games[gameId];
-  
-  if (game.started) {
-    return res.status(400).json({ error: 'Game has already started' });
-  }
-  
-  // Validate 2-8 player requirement
-  if (game.players.length < 2) {
-    return res.status(400).json({ 
-      error: 'Minimum of 2 players required to start game',
-      currentCount: game.players.length
+  try {
+    const game = req.game;
+    
+    if (game.gameStarted) {
+      return res.status(400).json({ error: 'Game has already started' });
+    }
+    
+    if (game.players.length < 2) {
+      return res.status(400).json({ 
+        error: 'Minimum of 2 players required to start the game',
+        currentPlayers: game.players.length
+      });
+    }
+    
+    if (game.players.length > 8) {
+      return res.status(400).json({ 
+        error: 'Maximum of 8 players allowed to start the game',
+        currentPlayers: game.players.length
+      });
+    }
+    
+    game.gameStarted = true;
+    game.startedAt = new Date().toISOString();
+    
+    res.json({
+      message: 'Game started successfully',
+      gameId: req.params.gameId,
+      players: game.players,
+      startedAt: game.startedAt
     });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
   }
-  
-  if (game.players.length > 8) {
-    return res.status(400).json({ 
-      error: 'Maximum of 8 players allowed per game',
-      currentCount: game.players.length
-    });
-  }
-  
-  game.started = true;
-  game.startedAt = new Date().toISOString();
-  saveGames();
-  
-  res.json({
-    message: 'Game started successfully',
-    playerCount: game.players.length,
-    players: game.players
-  });
 });
 
 module.exports = router;
