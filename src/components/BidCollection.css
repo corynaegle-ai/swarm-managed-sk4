@@ -1,0 +1,77 @@
+.bid-collection {
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.bid-collection h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.bid-inputs {
+  margin-bottom: 30px;
+}
+
+.bid-input-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bid-input-group label {
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.bid-input {
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.bid-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.submit-button:disabled {
+  background-color: #6c757d;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.submit-button:disabled:hover {
+  background-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
