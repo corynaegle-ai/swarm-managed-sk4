@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './ScoreDisplay.module.css';
 
 const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
@@ -79,6 +80,24 @@ const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
       </div>
     </div>
   );
+};
+
+ScoreDisplay.propTypes = {
+  gameData: PropTypes.shape({
+    players: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        name: PropTypes.string,
+        rounds: PropTypes.arrayOf(PropTypes.number)
+      })
+    )
+  }),
+  currentRound: PropTypes.number
+};
+
+ScoreDisplay.defaultProps = {
+  gameData: null,
+  currentRound: 1
 };
 
 export default ScoreDisplay;
