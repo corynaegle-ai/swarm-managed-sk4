@@ -90,11 +90,23 @@
   background-color: #f57c00;
 }
 
+.playerRow {
+  background-color: white;
+}
+
 .playerRow:nth-child(even) {
   background-color: #fafafa;
 }
 
+.playerRow:nth-child(even) .playerName {
+  background-color: #fafafa;
+}
+
 .playerRow:hover {
+  background-color: #f0f0f0;
+}
+
+.playerRow:hover .playerName {
   background-color: #f0f0f0;
 }
 
@@ -103,7 +115,7 @@
   font-weight: 500;
   position: sticky;
   left: 0;
-  background-color: white;
+  background-color: inherit;
   border-right: 2px solid #ddd;
   z-index: 10;
 }
