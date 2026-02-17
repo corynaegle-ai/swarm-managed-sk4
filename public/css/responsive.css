@@ -1,0 +1,189 @@
+/* Import variables */
+@import 'variables.css';
+
+/* Reset and base styles - Mobile First */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: var(--font-size-base); /* 16px minimum */
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Container system */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* Flexible Grid System - Mobile First */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--grid-gap);
+  width: 100%;
+}
+
+/* Grid column classes for mobile */
+.col-1 { grid-column: span 1; }
+.col-2 { grid-column: span 1; }
+.col-3 { grid-column: span 1; }
+.col-4 { grid-column: span 1; }
+.col-5 { grid-column: span 1; }
+.col-6 { grid-column: span 1; }
+.col-7 { grid-column: span 1; }
+.col-8 { grid-column: span 1; }
+.col-9 { grid-column: span 1; }
+.col-10 { grid-column: span 1; }
+.col-11 { grid-column: span 1; }
+.col-12 { grid-column: span 1; }
+
+/* Flexbox utilities */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.align-start { align-items: flex-start; }
+.align-center { align-items: center; }
+.align-end { align-items: flex-end; }
+.align-stretch { align-items: stretch; }
+
+/* Typography - Mobile optimized */
+h1, h2, h3, h4, h5, h6 {
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-md);
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+h4, h5, h6 { font-size: var(--font-size-base); }
+
+p {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Spacing utilities */
+.m-0 { margin: 0; }
+.mt-1 { margin-top: var(--spacing-sm); }
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.p-1 { padding: var(--spacing-sm); }
+.p-2 { padding: var(--spacing-md); }
+.p-3 { padding: var(--spacing-lg); }
+
+/* Tablet Breakpoint - min-width: 768px */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-xl);
+  }
+  
+  /* 2-column grid for tablets */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Tablet column spans */
+  .tablet\:col-1 { grid-column: span 1; }
+  .tablet\:col-2 { grid-column: span 2; }
+  
+  /* Typography adjustments */
+  h1 { font-size: calc(var(--font-size-2xl) * 1.2); }
+  h2 { font-size: calc(var(--font-size-xl) * 1.1); }
+  
+  /* Flex direction changes */
+  .tablet\:flex-row {
+    flex-direction: row;
+  }
+}
+
+/* Desktop Breakpoint - min-width: 1024px */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-2xl);
+  }
+  
+  /* Full 12-column grid for desktop */
+  .grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+  
+  /* Desktop column spans */
+  .desktop\:col-1 { grid-column: span 1; }
+  .desktop\:col-2 { grid-column: span 2; }
+  .desktop\:col-3 { grid-column: span 3; }
+  .desktop\:col-4 { grid-column: span 4; }
+  .desktop\:col-5 { grid-column: span 5; }
+  .desktop\:col-6 { grid-column: span 6; }
+  .desktop\:col-7 { grid-column: span 7; }
+  .desktop\:col-8 { grid-column: span 8; }
+  .desktop\:col-9 { grid-column: span 9; }
+  .desktop\:col-10 { grid-column: span 10; }
+  .desktop\:col-11 { grid-column: span 11; }
+  .desktop\:col-12 { grid-column: span 12; }
+  
+  /* Typography enhancements */
+  h1 { font-size: calc(var(--font-size-2xl) * 1.5); }
+  h2 { font-size: calc(var(--font-size-xl) * 1.3); }
+  h3 { font-size: calc(var(--font-size-lg) * 1.2); }
+  
+  /* Desktop-specific utilities */
+  .desktop\:flex-row {
+    flex-direction: row;
+  }
+  
+  .desktop\:justify-start { justify-content: flex-start; }
+  .desktop\:justify-center { justify-content: center; }
+  .desktop\:justify-end { justify-content: flex-end; }
+}
+
+/* Responsive utilities */
+.hidden { display: none; }
+
+@media (min-width: 768px) {
+  .tablet\:block { display: block; }
+  .tablet\:hidden { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .desktop\:block { display: block; }
+  .desktop\:hidden { display: none; }
+}
+
+/* Responsive text alignment */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+@media (min-width: 768px) {
+  .tablet\:text-left { text-align: left; }
+  .tablet\:text-center { text-align: center; }
+  .tablet\:text-right { text-align: right; }
+}
+
+@media (min-width: 1024px) {
+  .desktop\:text-left { text-align: left; }
+  .desktop\:text-center { text-align: center; }
+  .desktop\:text-right { text-align: right; }
+}
