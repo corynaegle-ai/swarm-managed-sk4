@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Application{% endblock %}</title>
+    
+    <!-- Base CSS - Load first -->
+    <link rel="stylesheet" href="/css/base.css">
+    
+    <!-- Responsive CSS files - Load in dependency order -->
+    <link rel="stylesheet" href="/css/responsive-grid.css">
+    <link rel="stylesheet" href="/css/responsive-components.css">
+    <link rel="stylesheet" href="/css/responsive-utilities.css">
+    
+    <!-- Additional page-specific styles -->
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <nav class="nav responsive-nav">
+            <div class="nav-brand">
+                <a href="/">My App</a>
+            </div>
+            <div class="nav-menu">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/about" class="nav-link">About</a>
+                <a href="/contact" class="nav-link">Contact</a>
+            </div>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 My Application. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>
