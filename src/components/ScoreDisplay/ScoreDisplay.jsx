@@ -1,52 +1,48 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styles from './ScoreDisplay.module.css';
 
-const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
-  // Handle empty or invalid data
-  if (!gameData || !gameData.players || gameData.players.length === 0) {
+const ScoreDisplay = ({ 
+  players = [], 
+  rounds = [], 
+  currentRound = 0,
+  scores = {} 
+}) => {
+  // Calculate total scores and sort players by total score (highest first)
+  const playersWithTotals = players.map(player => {
+    const playerScores = scores[player.id] || {};
+    const totalScore = rounds.reduce((sum, round, index) => {
+      return sum + (playerScores[index] || 0);
+    }, 0);
+    
+    return {
+      ...player,
+      totalScore,
+      roundScores: rounds.map((_, index) => playerScores[index] || 0)
+    };
+  }).sort((a, b) => b.totalScore - a.totalScore);
+
+  if (players.length === 0) {
     return (
-      <div className={styles.container}>
-        <p className={styles.noData}>No game data available</p>
+      <div className={styles.emptyState}>
+        <p>No players added yet</p>
       </div>
     );
   }
 
-  // Calculate total scores and sort players by total score descending
-  const playersWithTotals = gameData.players
-    .map((player, index) => ({
-      ...player,
-      totalScore: player.rounds ? player.rounds.reduce((sum, score) => sum + (score || 0), 0) : 0,
-      originalIndex: index
-    }))
-    .sort((a, b) => {
-      // Sort by total score descending, then by original index for stable sort
-      if (b.totalScore !== a.totalScore) {
-        return b.totalScore - a.totalScore;
-      }
-      return a.originalIndex - b.originalIndex;
-    });
-
-  // Get maximum number of rounds to determine columns
-  const maxRounds = Math.max(
-    ...playersWithTotals.map(player => (player.rounds ? player.rounds.length : 0)),
-    currentRound
-  );
-
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Score Board</h2>
-      
-      <div className={styles.tableWrapper}>
+    <div className={styles.scoreDisplay}>
+      <div className={styles.tableContainer}>
         <table className={styles.scoreTable}>
           <thead>
             <tr>
               <th className={styles.playerHeader}>Player</th>
               <th className={styles.totalHeader}>Total</th>
-              {Array.from({ length: maxRounds }, (_, index) => (
+              {rounds.map((round, index) => (
                 <th 
                   key={index} 
-                  className={`${styles.roundHeader} ${index + 1 === currentRound ? styles.currentRound : ''}`}
+                  className={`${styles.roundHeader} ${
+                    index === currentRound ? styles.currentRound : ''
+                  }`}
                 >
                   Round {index + 1}
                 </th>
@@ -55,22 +51,24 @@ const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
           </thead>
           <tbody>
             {playersWithTotals.map((player, playerIndex) => (
-              <tr key={player.id || playerIndex} className={styles.playerRow}>
+              <tr key={player.id} className={styles.playerRow}>
                 <td className={styles.playerName}>
-                  {player.name || `Player ${playerIndex + 1}`}
+                  <div className={styles.playerInfo}>
+                    <span className={styles.rank}>#{playerIndex + 1}</span>
+                    <span className={styles.name}>{player.name}</span>
+                  </div>
                 </td>
                 <td className={styles.totalScore}>
                   {player.totalScore}
                 </td>
-                {Array.from({ length: maxRounds }, (_, roundIndex) => (
+                {player.roundScores.map((score, roundIndex) => (
                   <td 
                     key={roundIndex} 
-                    className={`${styles.roundScore} ${roundIndex + 1 === currentRound ? styles.currentRoundCell : ''}`}
+                    className={`${styles.roundScore} ${
+                      roundIndex === currentRound ? styles.currentRound : ''
+                    }`}
                   >
-                    {player.rounds && player.rounds[roundIndex] !== undefined 
-                      ? player.rounds[roundIndex] 
-                      : '-'
-                    }
+                    {score}
                   </td>
                 ))}
               </tr>
@@ -80,24 +78,6 @@ const ScoreDisplay = ({ gameData, currentRound = 1 }) => {
       </div>
     </div>
   );
-};
-
-ScoreDisplay.propTypes = {
-  gameData: PropTypes.shape({
-    players: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        name: PropTypes.string,
-        rounds: PropTypes.arrayOf(PropTypes.number)
-      })
-    )
-  }),
-  currentRound: PropTypes.number
-};
-
-ScoreDisplay.defaultProps = {
-  gameData: null,
-  currentRound: 1
 };
 
 export default ScoreDisplay;
