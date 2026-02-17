@@ -1,0 +1,182 @@
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.noData {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.scoreTable {
+  width: 100%;
+  min-width: 400px;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.scoreTable th,
+.scoreTable td {
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.scoreTable th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.playerHeader {
+  text-align: left;
+  min-width: 120px;
+  position: sticky;
+  left: 0;
+  background-color: #f5f5f5;
+  z-index: 20;
+  border-right: 2px solid #ddd;
+}
+
+.totalHeader {
+  min-width: 80px;
+  background-color: #e3f2fd;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.roundHeader {
+  min-width: 70px;
+  white-space: nowrap;
+}
+
+.currentRound {
+  background-color: #fff3e0;
+  color: #f57c00;
+  font-weight: 700;
+  position: relative;
+}
+
+.currentRound::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #f57c00;
+}
+
+.playerRow:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.playerRow:hover {
+  background-color: #f0f0f0;
+}
+
+.playerName {
+  text-align: left;
+  font-weight: 500;
+  position: sticky;
+  left: 0;
+  background-color: inherit;
+  border-right: 2px solid #ddd;
+  z-index: 10;
+}
+
+.totalScore {
+  font-weight: 700;
+  color: #1976d2;
+  background-color: #f8f9fa;
+  font-size: 1.1rem;
+}
+
+.roundScore {
+  font-weight: 400;
+  color: #555;
+}
+
+.currentRoundCell {
+  background-color: #fff8e1;
+  font-weight: 600;
+  color: #f57c00;
+}
+
+/* Mobile responsive styles */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .scoreTable th,
+  .scoreTable td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .playerHeader {
+    min-width: 100px;
+  }
+  
+  .totalHeader {
+    min-width: 60px;
+  }
+  
+  .roundHeader {
+    min-width: 50px;
+    font-size: 0.8rem;
+  }
+  
+  .totalScore {
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 0.25rem;
+  }
+  
+  .scoreTable th,
+  .scoreTable td {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .playerHeader {
+    min-width: 80px;
+  }
+  
+  .roundHeader {
+    min-width: 45px;
+  }
+}
