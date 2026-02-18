@@ -1,157 +1,158 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useGameFlow } from '../context/GameFlowContext';
 import BiddingPhase from '../components/BiddingPhase';
-import TrickPhase from '../components/TrickPhase';
+import PlayingPhase from '../components/PlayingPhase';
 import ScoringPhase from '../components/ScoringPhase';
 import GameOverScreen from '../components/GameOverScreen';
+import './GamePage.css';
 
 const GamePage = () => {
-  const dispatch = useDispatch();
-  const gameState = useSelector(state => state.game);
-  const { currentPhase, round, isPhaseComplete } = gameState;
+  const { gameState, dispatch } = useGameFlow();
+  const [players] = useState([
+    { id: 1, name: 'Player 1', score: 0 },
+    { id: 2, name: 'Player 2', score: 0 },
+    { id: 3, name: 'Player 3', score: 0 },
+    { id: 4, name: 'Player 4', score: 0 }
+  ]);
 
-  // Handle phase completion and automatic progression
-  const handlePhaseComplete = useCallback(() => {
+  // Handle phase completion
+  const handlePhaseComplete = () => {
     dispatch({ type: 'NEXT_PHASE' });
-  }, [dispatch]);
+  };
 
-  // Handle game completion logic
-  const handleGameComplete = useCallback(() => {
-    if (round >= 10) {
-      dispatch({ type: 'SET_PHASE', payload: 'gameOver' });
+  // Handle game completion
+  const handleGameComplete = () => {
+    if (gameState.round >= 10) {
+      dispatch({ type: 'GAME_OVER' });
     } else {
       dispatch({ type: 'INCREMENT_ROUND' });
-      dispatch({ type: 'SET_PHASE', payload: 'bidding' });
     }
-  }, [round, dispatch]);
+  };
 
   // Auto-advance from scoring phase after 2 seconds
   useEffect(() => {
-    let timer;
-    if (currentPhase === 'scoring' && isPhaseComplete) {
-      timer = setTimeout(() => {
-        handlePhaseComplete();
+    if (gameState.currentPhase === 'scoring' && gameState.isPhaseComplete) {
+      const timer = setTimeout(() => {
+        handleGameComplete();
       }, 2000);
-    }
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [currentPhase, isPhaseComplete, handlePhaseComplete]);
 
-  // Check for game completion after scoring phase completes
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.currentPhase, gameState.isPhaseComplete, gameState.round]);
+
+  // Mark scoring phase as complete when it loads
   useEffect(() => {
-    // When transitioning from scoring phase, check if game should end
-    if (currentPhase === 'bidding' && round > 1) {
-      // We just transitioned to a new round, check if we should have ended
-      if (round > 10) {
-        dispatch({ type: 'SET_PHASE', payload: 'gameOver' });
-      }
+    if (gameState.currentPhase === 'scoring' && !gameState.isPhaseComplete) {
+      dispatch({ type: 'SET_PHASE_COMPLETE' });
     }
-  }, [currentPhase, round, dispatch]);
+  }, [gameState.currentPhase, gameState.isPhaseComplete]);
 
-  // Progress indicator component
-  const ProgressIndicator = () => (
-    <div className="progress-indicator" style={{
-      padding: '16px',
-      backgroundColor: '#f5f5f5',
-      borderRadius: '8px',
-      marginBottom: '20px',
-      textAlign: 'center',
-      fontSize: '18px',
-      fontWeight: 'bold',
-      color: '#333'
-    }}>
-      Round {round} of 10
-      <div style={{
-        width: '100%',
-        backgroundColor: '#ddd',
-        borderRadius: '10px',
-        marginTop: '8px',
-        height: '10px'
-      }}>
-        <div style={{
-          width: `${(round / 10) * 100}%`,
-          backgroundColor: '#4CAF50',
-          height: '100%',
-          borderRadius: '10px',
-          transition: 'width 0.3s ease'
-        }} />
-      </div>
-    </div>
-  );
-
-  // Render appropriate phase component
-  const renderPhaseComponent = () => {
-    switch (currentPhase) {
+  const renderCurrentPhase = () => {
+    switch (gameState.currentPhase) {
       case 'bidding':
-        return <BiddingPhase onComplete={handlePhaseComplete} />;
-      case 'tricks':
-        return <TrickPhase onComplete={handlePhaseComplete} />;
+        return (
+          <BiddingPhase
+            players={players}
+            round={gameState.round}
+            onComplete={handlePhaseComplete}
+          />
+        );
+      case 'playing':
+        return (
+          <PlayingPhase
+            players={players}
+            round={gameState.round}
+            onComplete={handlePhaseComplete}
+          />
+        );
       case 'scoring':
         return (
-          <ScoringPhase 
+          <ScoringPhase
+            players={players}
+            round={gameState.round}
             onComplete={handlePhaseComplete}
-            onGameComplete={handleGameComplete}
           />
         );
       case 'gameOver':
-        return <GameOverScreen />;
-      default:
         return (
-          <div style={{ padding: '20px', textAlign: 'center' }}>
-            <h3>Unknown game phase: {currentPhase}</h3>
-            <button 
-              onClick={handlePhaseComplete}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '16px',
-                marginTop: '10px'
-              }}
-            >
-              Continue Game
-            </button>
-          </div>
+          <GameOverScreen
+            players={players}
+            onRestart={() => dispatch({ type: 'RESET_GAME' })}
+          />
         );
+      default:
+        return <div>Unknown phase</div>;
+    }
+  };
+
+  const getPhaseTitle = () => {
+    switch (gameState.currentPhase) {
+      case 'bidding':
+        return 'Bidding Phase';
+      case 'playing':
+        return 'Playing Phase';
+      case 'scoring':
+        return 'Scoring Phase';
+      case 'gameOver':
+        return 'Game Over';
+      default:
+        return 'Game';
     }
   };
 
   return (
-    <div className="game-page" style={{
-      maxWidth: '800px',
-      margin: '0 auto',
-      padding: '20px'
-    }}>
-      <ProgressIndicator />
-      
-      {renderPhaseComponent()}
-      
-      {/* Manual progression fallback button */}
-      {currentPhase !== 'gameOver' && (
-        <div style={{
-          marginTop: '20px',
-          textAlign: 'center'
-        }}>
-          <button 
-            onClick={handlePhaseComplete}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            Manual Advance (Fallback)
-          </button>
+    <div className="game-page">
+      <header className="game-header">
+        <div className="game-progress">
+          <h2 className="game-title">{getPhaseTitle()}</h2>
+          {gameState.currentPhase !== 'gameOver' && (
+            <div className="round-indicator">
+              <span className="round-text">Round {gameState.round} of 10</span>
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${(gameState.round / 10) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Manual progression buttons for fallback */}
+        {gameState.currentPhase !== 'gameOver' && (
+          <div className="manual-controls">
+            <button 
+              onClick={handlePhaseComplete}
+              className="manual-next-btn"
+              title="Manual phase progression"
+            >
+              Next Phase
+            </button>
+            {gameState.currentPhase === 'scoring' && (
+              <button 
+                onClick={handleGameComplete}
+                className="manual-complete-btn"
+                title="Manual game completion"
+              >
+                Complete Round
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+
+      <main className="game-content">
+        {renderCurrentPhase()}
+      </main>
+
+      {/* Debug info in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="debug-info">
+          <small>
+            Phase: {gameState.currentPhase} | 
+            Round: {gameState.round} | 
+            Complete: {gameState.isPhaseComplete ? 'Yes' : 'No'}
+          </small>
         </div>
       )}
     </div>

@@ -1,7 +1,73 @@
-import React, { createContext, useContext, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { createContext, useContext, useReducer } from 'react';
 
 const GameFlowContext = createContext();
+
+const initialState = {
+  currentPhase: 'bidding',
+  round: 1,
+  isPhaseComplete: false,
+  gameOver: false
+};
+
+const gameFlowReducer = (state, action) => {
+  switch (action.type) {
+    case 'NEXT_PHASE':
+      const phaseOrder = ['bidding', 'playing', 'scoring'];
+      const currentIndex = phaseOrder.indexOf(state.currentPhase);
+      const nextPhase = phaseOrder[(currentIndex + 1) % phaseOrder.length];
+      
+      return {
+        ...state,
+        currentPhase: nextPhase,
+        isPhaseComplete: false
+      };
+    
+    case 'SET_PHASE_COMPLETE':
+      return {
+        ...state,
+        isPhaseComplete: true
+      };
+    
+    case 'SET_PHASE':
+      return {
+        ...state,
+        currentPhase: action.payload,
+        isPhaseComplete: false
+      };
+    
+    case 'INCREMENT_ROUND':
+      return {
+        ...state,
+        round: state.round + 1,
+        currentPhase: 'bidding',
+        isPhaseComplete: false
+      };
+    
+    case 'GAME_OVER':
+      return {
+        ...state,
+        currentPhase: 'gameOver',
+        gameOver: true,
+        isPhaseComplete: false
+      };
+    
+    case 'RESET_GAME':
+      return initialState;
+    
+    default:
+      return state;
+  }
+};
+
+export const GameFlowProvider = ({ children }) => {
+  const [gameState, dispatch] = useReducer(gameFlowReducer, initialState);
+
+  return (
+    <GameFlowContext.Provider value={{ gameState, dispatch }}>
+      {children}
+    </GameFlowContext.Provider>
+  );
+};
 
 export const useGameFlow = () => {
   const context = useContext(GameFlowContext);
@@ -10,45 +76,3 @@ export const useGameFlow = () => {
   }
   return context;
 };
-
-export const GameFlowProvider = ({ children }) => {
-  const dispatch = useDispatch();
-  const gameState = useSelector(state => state.game);
-
-  const nextPhase = useCallback(() => {
-    dispatch({ type: 'NEXT_PHASE' });
-  }, [dispatch]);
-
-  const setPhase = useCallback((phase) => {
-    dispatch({ type: 'SET_PHASE', payload: phase });
-  }, [dispatch]);
-
-  const incrementRound = useCallback(() => {
-    dispatch({ type: 'INCREMENT_ROUND' });
-  }, [dispatch]);
-
-  const completePhase = useCallback(() => {
-    dispatch({ type: 'COMPLETE_PHASE' });
-  }, [dispatch]);
-
-  const resetPhase = useCallback(() => {
-    dispatch({ type: 'RESET_PHASE' });
-  }, [dispatch]);
-
-  const value = {
-    gameState,
-    nextPhase,
-    setPhase,
-    incrementRound,
-    completePhase,
-    resetPhase
-  };
-
-  return (
-    <GameFlowContext.Provider value={value}>
-      {children}
-    </GameFlowContext.Provider>
-  );
-};
-
-export default GameFlowContext;
