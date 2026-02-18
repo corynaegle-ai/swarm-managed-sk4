@@ -88,18 +88,30 @@ describe('GamePage', () => {
   test('shows game completion screen after round 10', async () => {
     renderWithProvider(<GamePage />);
     
-    // Simulate completing 10 rounds by manually advancing through phases
+    // Verify we start at round 1
+    expect(screen.getByText('Round 1 of 10')).toBeInTheDocument();
+    
+    // Simulate completing 10 rounds by advancing through phases
     for (let round = 1; round <= 10; round++) {
-      // Go through bidding and playing phases
-      if (round > 1) {
-        fireEvent.click(screen.getByText('Next Phase')); // to playing
-        fireEvent.click(screen.getByText('Next Phase')); // to scoring
-      } else {
-        fireEvent.click(screen.getByText('Next Phase')); // to playing
-        fireEvent.click(screen.getByText('Next Phase')); // to scoring
-      }
+      // Verify current round
+      expect(screen.getByText(`Round ${round} of 10`)).toBeInTheDocument();
       
-      // If this is round 10, should show game over
+      // Complete bidding phase
+      expect(screen.getByTestId('bidding-phase')).toBeInTheDocument();
+      fireEvent.click(screen.getByText('Next Phase'));
+      
+      // Complete playing phase
+      await waitFor(() => {
+        expect(screen.getByTestId('playing-phase')).toBeInTheDocument();
+      });
+      fireEvent.click(screen.getByText('Next Phase'));
+      
+      // Now in scoring phase
+      await waitFor(() => {
+        expect(screen.getByTestId('scoring-phase')).toBeInTheDocument();
+      });
+      
+      // If this is round 10, should show game over after auto-advance
       if (round === 10) {
         jest.advanceTimersByTime(2000);
         await waitFor(() => {
@@ -111,6 +123,7 @@ describe('GamePage', () => {
         jest.advanceTimersByTime(2000);
         await waitFor(() => {
           expect(screen.getByText(`Round ${round + 1} of 10`)).toBeInTheDocument();
+          expect(screen.getByTestId('bidding-phase')).toBeInTheDocument();
         });
       }
     }
